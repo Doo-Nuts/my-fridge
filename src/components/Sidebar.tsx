@@ -1,14 +1,19 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Boxes, Settings, ClipboardList, Filter } from "lucide-react"; // ✅ 필터 아이콘 추가
-import { categories } from "../constants/categories"; // ✅ 카테고리 리스트 가져오기
+import { Boxes, Settings, ClipboardList, Filter } from "lucide-react";
+import { categories } from "../constants/categories";
+import ReactRouterDOM from "react-router-dom";
 
-export default function Sidebar() {
-  const location = useLocation();
+const { Link } = ReactRouterDOM;
+
+type SidebarProps = {
+  pathname: string;
+};
+
+export default function Sidebar({ pathname }: SidebarProps) {
+  console.log("✅ Sidebar loaded");
   const [showFilter, setShowFilter] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-  // ✅ 체크박스 선택/해제 핸들러
   const handleCategoryChange = (category: string) => {
     setSelectedCategories((prev) =>
       prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
@@ -23,25 +28,25 @@ export default function Sidebar() {
           <Link
             to="/"
             className={`flex items-center p-3 rounded-lg transition ${
-              location.pathname === "/" ? "bg-green-700 text-white" : "hover:bg-gray-700"
+              pathname === "/" ? "bg-green-700 text-white" : "hover:bg-gray-700"
             }`}
           >
             <ClipboardList className="w-5 h-5 mr-2" /> 냉장고 현황
           </Link>
         </li>
+
         <li>
           <Link
             to="/items"
             className={`flex items-center p-3 rounded-lg transition ${
-              location.pathname === "/items" ? "bg-green-700 text-white" : "hover:bg-gray-700"
+              pathname === "/items" ? "bg-green-700 text-white" : "hover:bg-gray-700"
             }`}
           >
             <Boxes className="w-5 h-5 mr-2" /> 식재료 관리
           </Link>
         </li>
 
-        {/* ✅ 필터 드롭다운 (식재료 관리 페이지에서만 보이도록 처리) */}
-        {location.pathname === "/items" && (
+        {pathname === "/items" && (
           <li
             className="relative cursor-pointer"
             onMouseEnter={() => setShowFilter(true)}
@@ -51,12 +56,10 @@ export default function Sidebar() {
               <Filter className="w-5 h-5 mr-2" /> 필터
             </div>
 
-            {/* ✅ 드롭다운 메뉴 */}
             {showFilter && (
               <ul className="absolute left-0 top-[40px] bg-gray-700 border border-gray-600 rounded-lg w-52 mt-1 p-2 shadow-lg transition-all duration-200 ease-in-out transform opacity-100 scale-100 max-h-[400px] overflow-y-auto">
                 {categories.map(({ key, label }) => (
                   <li key={key} className="hover:bg-gray-600 rounded-lg">
-                    {/* ✅ 전체 클릭 가능하도록 설정 */}
                     <label htmlFor={key} className="flex items-center p-3 w-full cursor-pointer">
                       <input
                         type="checkbox"
@@ -78,7 +81,7 @@ export default function Sidebar() {
           <Link
             to="/settings"
             className={`flex items-center p-3 rounded-lg transition ${
-              location.pathname === "/settings" ? "bg-green-700 text-white" : "hover:bg-gray-700"
+              pathname === "/settings" ? "bg-green-700 text-white" : "hover:bg-gray-700"
             }`}
           >
             <Settings className="w-5 h-5 mr-2" /> 설정

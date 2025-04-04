@@ -1,54 +1,56 @@
 import useExpiringItems from "../hooks/useExpiringItems";
 import Footer from "./Footer";
 import Header from "./Header";
-import Sidebar from "./Sidebar";
-import { useLocation } from "react-router-dom";
 import Notification from "./Notification";
 import { useEffect } from "react";
 import { useItemStore } from "../store/useItemStore";
 import { useAuthStore } from "../store/useAuthStore";
 
+import type { ReactNode } from "react";
+
+// ✅ 직접 import
+import SidebarWrapper from "./SidebarWrapper";
+
 export default function GlobalLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
-  const location = useLocation();
+  const isClient = typeof window !== "undefined";
+
   const { fetchAllItems } = useItemStore();
   const { user, loadUser } = useAuthStore();
 
-  // ✅ 특정 페이지에서 Sidebar를 숨김
   const hideSidebarRoutes = ["/settings", "/login"];
-  const showSidebar = !hideSidebarRoutes.includes(location.pathname);
+  const currentPath = isClient ? window.location.pathname : "/";
+  const showSidebar = isClient
+    ? !hideSidebarRoutes.includes(currentPath)
+    : true; // SSR 시 Sidebar는 무조건 보여줌 (또는 빈 공간)
+
   useExpiringItems();
 
   useEffect(() => {
     loadUser();
-  }, []);  // ✅ 최초 마운트 시에만 실행
-  
+  }, []);
+
   useEffect(() => {
     if (user) fetchAllItems();
-  }, [user]);  // ✅ user가 변경될 때만 실행
+  }, [user]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-gray-200">
-      {/* ✅ 상단 네비게이션 */}
       <Header />
       <Notification />
-
-      {/* ✅ 컨텐츠 영역 (Sidebar 포함) */}
       <div className="flex flex-1 container mx-auto">
-        {showSidebar && <Sidebar />}
+        {isClient && showSidebar && <SidebarWrapper />}
         <main
           className={`flex-1 p-6 ${
-            showSidebar ? "ml-4" : ""
+            isClient && showSidebar ? "ml-4" : ""
           } bg-gray-800 rounded-lg shadow-lg`}
         >
           {children}
         </main>
       </div>
-
-      {/* ✅ Footer */}
       <Footer />
     </div>
   );

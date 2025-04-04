@@ -1,6 +1,7 @@
-import { Link } from "react-router-dom";
+import * as ReactRouterDOM from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../store/useAuthStore";
+const { Link } = ReactRouterDOM;
 
 export default function Header() {
   const { user, logout } = useAuthStore();
